@@ -5,7 +5,7 @@ const hole = 'O';
 const fieldCharacter = '░';
 const pathCharacter = '*';
 
-const isGameFinished = false;
+let isGameFinished = false;
 
 class Field {
     constructor(field) {
@@ -35,7 +35,7 @@ class Field {
     }
 
     print() {
-        console.log(this.field.join());
+        console.log(this.field.join(""));
     }
 }
 
@@ -47,41 +47,46 @@ const myField = new Field([
 ]);
 
 myField.print();
-// let theField = myField.field.join();
-// console.log(theField);
-// console.log(myField.field[0][0]);
 
 while (!isGameFinished) {
-    const direction = prompt('Which direction? u, d, l, or r: ');
-    switch (direction) {
-        case "u":
-            console.log("up!");
-            // move pathCharater
-            myField.print();
-            break;
-        case "d":
-            console.log("down!");
-            // move pathCharater
-            // how to I call a setter and use it????????????
-            myField.y(1);
-            myField.field[myField.y][myField.x] = pathCharacter;
-            myField.print();
-            break;
-        case "l":
-            console.log("left!");
-            // move pathCharater
-            myField.print();
-            break;
-        case "r":
-            console.log("right!");
-            // move pathCharater
-            myField.field[0][1] = pathCharacter;
-            myField.print();
-            break;
-        default:
-            prompt("Enter a valid direction: ");
-            // Need to run through switch statement again with this direction
-            break;
+    inputPromptLoop();
+    if ( !myField.field[myField.y] || !myField.field[myField.y][myField.x]) {
+        loseGame("out of bounds");
+    } else if (myField.field[myField.y][myField.x] === hole) {
+        loseGame("hole");
+    } else if (myField.field[myField.y][myField.x] === hat) {
+        winGame();
+    } else {   
+        myField.field[myField.y][myField.x] = pathCharacter;
+        myField.print();
+    }
+}
+
+function inputPromptLoop() {
+    let direction = prompt('Which direction? u, d, l, or r: ');
+    let input = "invalid";
+    while (input === "invalid") {
+        switch (direction) {
+            case "u":
+                myField.y = -1;
+                input = "valid";
+                break;
+            case "d":
+                myField.y = 1;
+                input = "valid";
+                break;
+            case "l":
+                myField.x = -1;
+                input = "valid";
+                break;
+            case "r":
+                myField.x = 1;
+                input = "valid";
+                break;
+            default:
+                direction = prompt("Enter a valid direction: ");
+                break;
+        }
     }
 }
 
@@ -92,10 +97,9 @@ function winGame() {
 
 function loseGame(reason) {
     isGameFinished = true;
-    console.log("You lost!");
     if (reason == "hole") {
-        console.log("You fell in a hole!");
+        console.log("You lost by falling in a hole!");
     } else {
-        console.log("You stepped out of bounds!");
+        console.log("You lost by stepping out of bounds!");
     }
 }
