@@ -34,20 +34,36 @@ class Field {
         this._x += value;
     }
 
-    static generateField(height, width) {
+    static generateField(height, width, percentage = 0.3) {
         let field = new Array(height).fill(0).map(el => new Array(width).fill(fieldCharacter));
         const random = length => {
             return Math.floor(Math.random() * length);
         }
 
-        for (let i = 0; i < 5; i++) {
-            let x = random(width);
-            let y = random(height);
-            field[y][x] = hole;
+        // Set hole locations
+        let numberOfHoles = height * width * percentage;
+        for (let i = 1; i <= numberOfHoles; i++) {
+            let y;
+            let x;
+            do {
+                y = random(height);
+                x = random(width);
+                field[y][x] = hole;
+            } while (y === 0 && x === 0);
         }
 
-        field[random(height)][random(width)] = hat;
+        // Set hat location
+        let hatY;
+        let hatX;
+        do {
+            hatY = random(height);
+            hatX = random(width);
+            field[hatY][hatX] = hat;
+        } while (hatY === 0 && hatX === 0);
+
+        // Set path starting point
         field[0][0] = pathCharacter;
+
         return field;
     }
 
@@ -60,6 +76,18 @@ class Field {
 }
 
 function runGame() {
+    console.log("Choose a direction to move!");
+    console.table({
+        up: "u",
+        down: "d",
+        left: "l",
+        right: "r",
+        "diagonally up-left": "ul",
+        "diagonally up-right": "ur",
+        "diagonally down-left": "dl",
+        "diagonally down-right": "dr"
+    });
+    myField.print();
     while (!isGameFinished) {
         inputPromptLoop();
         if ( !myField.field[myField.y] || !myField.field[myField.y][myField.x]) {
@@ -76,7 +104,7 @@ function runGame() {
 }
 
 function inputPromptLoop() {
-    let direction = prompt('Which direction? u, d, l, or r: ');
+    let direction = prompt('Which direction? ');
     let input = "invalid";
     while (input === "invalid") {
         switch (direction) {
@@ -93,6 +121,26 @@ function inputPromptLoop() {
                 input = "valid";
                 break;
             case "r":
+                myField.x = 1;
+                input = "valid";
+                break;
+            case "ul":
+                myField.y = -1;
+                myField.x = -1;
+                input = "valid";
+                break;
+            case "ur":
+                myField.y = -1;
+                myField.x = 1;
+                input = "valid";
+                break;
+            case "dl":
+                myField.y = 1;
+                myField.x = -1;
+                input = "valid";
+                break;
+            case "dr":
+                myField.y = 1;
                 myField.x = 1;
                 input = "valid";
                 break;
@@ -119,5 +167,4 @@ function loseGame(reason) {
 
 const myField = new Field(Field.generateField(10, 10));
 
-myField.print();
 runGame();
